@@ -22,7 +22,10 @@ emoji-main-color-react-native/
     EmojiMainColorModule.java
     EmojiMainColorPackage.java
   example/
-    EmojiColorDemo.tsx
+    package.json
+    metro.config.js
+    src/App.tsx
+    src/components/EmojiColorCard.tsx
 ```
 
 ## Installation
@@ -152,6 +155,6 @@ Covered scenarios:
 - Disk cache uses lightweight platform stores (`NSUserDefaults` and `SharedPreferences`) for minimal dependencies.
 - Pixel transfer currently crosses bridge as integer arrays; this is simple and robust but could be optimized later with JSI/TurboModules if needed for extreme throughput.
 
-## Example Component
+## Example App
 
-See [`example/EmojiColorDemo.tsx`](./example/EmojiColorDemo.tsx) for ready-to-drop usage.
+A full runnable React Native sample project lives in [`example/`](./example), including app bootstrap files and a UI that demonstrates both `useEmojiColor` and `getEmojiColors`.
