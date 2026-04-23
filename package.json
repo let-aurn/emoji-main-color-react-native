@@ -1,0 +1,56 @@
+{
+  "name": "emoji-main-color-react-native",
+  "version": "1.0.0",
+  "description": "React Native library that extracts the dominant color and optional palette for an emoji.",
+  "author": "David",
+  "main": "src/index",
+  "types": "src/index",
+  "react-native": "src/index",
+  "source": "src/index",
+  "files": [
+    "src",
+    "android",
+    "ios",
+    "example",
+    "emoji-main-color-react-native.podspec",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "scripts": {
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run test"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "emoji",
+    "color",
+    "palette",
+    "dominant-color"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/emoji-main-color-react-native.git"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/react": "^19.2.0",
+    "jest": "^30.0.0",
+    "react": "^19.1.1",
+    "react-native": "^0.82.0",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
