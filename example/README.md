@@ -24,3 +24,4 @@ npm run android
 
 - The example depends on the local library via `"emoji-main-color-react-native": "file:.."`.
 - Metro is configured to watch the repo root so edits in `src/` are picked up.
+- `react-native.config.js` explicitly sets iOS/Android project config (including `automaticPodsInstallation`) to keep CLI behavior stable across `@react-native-community/cli` versions.
