@@ -1,6 +1,6 @@
 {
   "name": "emoji-main-color-react-native",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "React Native library that extracts the dominant color and optional palette for an emoji.",
   "author": "David",
   "main": "src/index",
