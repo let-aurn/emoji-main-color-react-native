@@ -110,6 +110,8 @@ public final class RNEmojiMainColorModule: NSObject {
     let payload = NSMutableDictionary()
     payload["emoji"] = emoji
     payload["mainColor"] = result.mainColor
+    payload["mainDarkColor"] = result.mainDarkColor
+    payload["mainLightColor"] = result.mainLightColor
     if let palette = result.palette {
       payload["palette"] = palette
     }
@@ -226,12 +228,32 @@ public final class RNEmojiMainColorModule: NSObject {
     }
 
     let sortedClusters = clusters.sorted { $0.score > $1.score }
-    let mainColor = sortedClusters[0].hexString()
+    let mainCluster = sortedClusters[0]
+    let mainColor = mainCluster.hexString()
+    let mainDarkColor = selectDarkCluster(from: sortedClusters, mainCluster: mainCluster).hexString()
+    let mainLightColor = selectLightCluster(from: sortedClusters, mainCluster: mainCluster).hexString()
     let palette = paletteSize > 0
       ? Array(sortedClusters.prefix(paletteSize).map { $0.hexString() })
       : nil
 
-    return AnalysisResult(mainColor: mainColor, palette: palette)
+    return AnalysisResult(
+      mainColor: mainColor,
+      mainDarkColor: mainDarkColor,
+      mainLightColor: mainLightColor,
+      palette: palette
+    )
+  }
+
+  private func selectDarkCluster(from clusters: [Cluster], mainCluster: Cluster) -> Cluster {
+    clusters
+      .filter { $0.brightness < mainCluster.brightness }
+      .max { $0.score < $1.score } ?? mainCluster
+  }
+
+  private func selectLightCluster(from clusters: [Cluster], mainCluster: Cluster) -> Cluster {
+    clusters
+      .filter { $0.brightness > mainCluster.brightness }
+      .max { $0.score < $1.score } ?? mainCluster
   }
 
   private func pixelWeight(red: Int, green: Int, blue: Int, alpha: Int) -> Double {
@@ -364,6 +386,10 @@ private final class Cluster {
     )
   }
 
+  var brightness: Double {
+    (averageRed * 299.0 + averageGreen * 587.0 + averageBlue * 114.0) / 1000.0
+  }
+
   private var averageRed: Double {
     redTotal / weightTotal
   }
@@ -379,6 +405,8 @@ private final class Cluster {
 
 private struct AnalysisResult {
   let mainColor: String
+  let mainDarkColor: String
+  let mainLightColor: String
   let palette: [String]?
 }
 

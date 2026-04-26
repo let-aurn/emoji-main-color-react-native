@@ -12,6 +12,8 @@ export type EmojiColorSource = 'computed' | 'memory-cache' | 'disk-cache';
 export type EmojiColorResult = {
   emoji: string;
   mainColor: string;
+  mainDarkColor: string;
+  mainLightColor: string;
   palette?: string[];
   source: EmojiColorSource;
 };
@@ -26,6 +28,8 @@ export type UseEmojiColorResult = {
 export type NativeEmojiColorPayload = {
   emoji: string;
   mainColor: string;
+  mainDarkColor?: string;
+  mainLightColor?: string;
   palette?: string[];
 };
 

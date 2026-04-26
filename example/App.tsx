@@ -51,6 +51,12 @@ export default function App() {
         <Text style={styles.status}>
           Main color: {loading ? 'Loading…' : result?.mainColor ?? '—'}
         </Text>
+        <Text style={styles.status}>
+          Dark color: {loading ? 'Loading…' : result?.mainDarkColor ?? '—'}
+        </Text>
+        <Text style={styles.status}>
+          Light color: {loading ? 'Loading…' : result?.mainLightColor ?? '—'}
+        </Text>
         <Text style={styles.status}>Source: {result?.source ?? 'pending'}</Text>
 
         <View style={styles.paletteRow}>

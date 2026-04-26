@@ -30,6 +30,8 @@ describe('emoji-main-color-react-native', () => {
     computeMock.mockResolvedValue({
       emoji: '🍋',
       mainColor: '#f4d83d',
+      mainDarkColor: '#6d8d3f',
+      mainLightColor: '#f8e789',
       palette: ['#f4d83d', '#90b95b'],
     });
     getCachedResultMock.mockResolvedValue(null);
@@ -39,6 +41,8 @@ describe('emoji-main-color-react-native', () => {
     expect(result).toEqual({
       emoji: '🍋',
       mainColor: '#F4D83D',
+      mainDarkColor: '#6D8D3F',
+      mainLightColor: '#F8E789',
       palette: ['#F4D83D', '#90B95B'],
       source: 'computed',
     });
@@ -53,6 +57,8 @@ describe('emoji-main-color-react-native', () => {
     computeMock.mockResolvedValue({
       emoji: '🦊',
       mainColor: '#D97729',
+      mainDarkColor: '#8F3F1E',
+      mainLightColor: '#F3A552',
       palette: ['#D97729'],
     });
 
@@ -68,6 +74,8 @@ describe('emoji-main-color-react-native', () => {
     getCachedResultMock.mockResolvedValue({
       emoji: '🍋',
       mainColor: '#F4D83D',
+      mainDarkColor: '#6D8D3F',
+      mainLightColor: '#F8E789',
       palette: ['#F4D83D', '#A1BF57'],
     });
 
@@ -85,6 +93,8 @@ describe('emoji-main-color-react-native', () => {
     computeMock.mockResolvedValue({
       emoji: '🍋',
       mainColor: '#F4D83D',
+      mainDarkColor: '#6D8D3F',
+      mainLightColor: '#F8E789',
       palette: ['#F4D83D'],
     });
 
@@ -94,6 +104,8 @@ describe('emoji-main-color-react-native', () => {
     expect(setCachedResultMock.mock.calls[0][1]).toEqual({
       emoji: '🍋',
       mainColor: '#F4D83D',
+      mainDarkColor: '#6D8D3F',
+      mainLightColor: '#F8E789',
       palette: ['#F4D83D'],
     });
   });
@@ -107,6 +119,8 @@ describe('emoji-main-color-react-native', () => {
               resolve({
                 emoji: '🍋',
                 mainColor: '#F4D83D',
+                mainDarkColor: '#6D8D3F',
+                mainLightColor: '#F8E789',
               }),
             0,
           );
@@ -132,6 +146,8 @@ describe('emoji-main-color-react-native', () => {
     expect(result).toEqual({
       emoji: '',
       mainColor: '#123456',
+      mainDarkColor: '#123456',
+      mainLightColor: '#123456',
       palette: ['#123456', '#123456'],
       source: 'computed',
     });

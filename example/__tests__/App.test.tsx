@@ -35,6 +35,8 @@ describe('App', () => {
       result: {
         emoji: '🍋',
         mainColor: '#F4D83D',
+        mainDarkColor: '#6D8D3F',
+        mainLightColor: '#F8E789',
         palette: ['#F4D83D', '#9DBB52', '#6D8D3F'],
         source: 'computed',
       },
@@ -44,9 +46,27 @@ describe('App', () => {
     });
 
     (getEmojiColors as jest.Mock).mockResolvedValue([
-      {emoji: '🍋', mainColor: '#F4D83D', source: 'computed'},
-      {emoji: '🦊', mainColor: '#D97729', source: 'computed'},
-    ] as Array<{emoji: string; mainColor: string; source: string}>);
+      {
+        emoji: '🍋',
+        mainColor: '#F4D83D',
+        mainDarkColor: '#6D8D3F',
+        mainLightColor: '#F8E789',
+        source: 'computed',
+      },
+      {
+        emoji: '🦊',
+        mainColor: '#D97729',
+        mainDarkColor: '#8F3F1E',
+        mainLightColor: '#F3A552',
+        source: 'computed',
+      },
+    ] as Array<{
+      emoji: string;
+      mainColor: string;
+      mainDarkColor: string;
+      mainLightColor: string;
+      source: string;
+    }>);
   });
 
   it('renders correctly', () => {

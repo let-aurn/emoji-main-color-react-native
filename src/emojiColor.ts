@@ -19,7 +19,7 @@ const DEFAULT_PALETTE_SIZE = 0;
 const MAX_PALETTE_SIZE = 8;
 const MIN_RENDER_SIZE = 16;
 const MAX_RENDER_SIZE = 256;
-const ALGORITHM_VERSION = 'v1';
+const ALGORITHM_VERSION = 'v2';
 const FALLBACK_SOURCE = 'computed';
 const HEX_COLOR_PATTERN = /^#?([0-9a-f]{6})$/i;
 
@@ -261,10 +261,24 @@ function sanitizePayload(
           .filter((color): color is string => color != null)
           .slice(0, options.paletteSize)
       : undefined;
+  const colorCandidates = dedupeColors([
+    mainColor,
+    ...(Array.isArray(payload.palette) ? payload.palette : []),
+  ])
+    .map(color => normalizeHexColor(color))
+    .filter((color): color is string => color != null);
+  const mainDarkColor =
+    normalizeHexColor(payload.mainDarkColor) ??
+    pickDarkColor(mainColor, colorCandidates);
+  const mainLightColor =
+    normalizeHexColor(payload.mainLightColor) ??
+    pickLightColor(mainColor, colorCandidates);
 
   return {
     emoji: payload.emoji,
     mainColor,
+    mainDarkColor,
+    mainLightColor,
     palette,
   };
 }
@@ -284,6 +298,40 @@ function dedupeColors(colors: string[]): string[] {
   return deduped;
 }
 
+function pickDarkColor(mainColor: string, colors: string[]): string {
+  const mainBrightness = colorBrightness(mainColor);
+  const darkerColors = colors.filter(
+    color => colorBrightness(color) < mainBrightness,
+  );
+
+  return (
+    darkerColors.sort(
+      (left, right) => colorBrightness(left) - colorBrightness(right),
+    )[0] ?? mainColor
+  );
+}
+
+function pickLightColor(mainColor: string, colors: string[]): string {
+  const mainBrightness = colorBrightness(mainColor);
+  const lighterColors = colors.filter(
+    color => colorBrightness(color) > mainBrightness,
+  );
+
+  return (
+    lighterColors.sort(
+      (left, right) => colorBrightness(right) - colorBrightness(left),
+    )[0] ?? mainColor
+  );
+}
+
+function colorBrightness(color: string): number {
+  const red = parseInt(color.slice(1, 3), 16);
+  const green = parseInt(color.slice(3, 5), 16);
+  const blue = parseInt(color.slice(5, 7), 16);
+
+  return (red * 299 + green * 587 + blue * 114) / 1000;
+}
+
 function toResult(
   payload: NativeEmojiColorPayload,
   source: EmojiColorResult['source'],
@@ -291,6 +339,8 @@ function toResult(
   return {
     emoji: payload.emoji,
     mainColor: payload.mainColor,
+    mainDarkColor: payload.mainDarkColor ?? payload.mainColor,
+    mainLightColor: payload.mainLightColor ?? payload.mainColor,
     palette: payload.palette,
     source,
   };
@@ -306,6 +356,8 @@ function buildFallbackOrThrow(
     return {
       emoji,
       mainColor: options.fallbackColor,
+      mainDarkColor: options.fallbackColor,
+      mainLightColor: options.fallbackColor,
       palette:
         options.paletteSize > 0
           ? Array(options.paletteSize).fill(options.fallbackColor)

@@ -79,6 +79,8 @@ class RNEmojiMainColorModule(
       val payload = JSONObject()
       payload.put("emoji", value.getString("emoji"))
       payload.put("mainColor", value.getString("mainColor"))
+      payload.put("mainDarkColor", value.getString("mainDarkColor"))
+      payload.put("mainLightColor", value.getString("mainLightColor"))
 
       if (value.hasKey("palette")) {
         val palette = value.getArray("palette")
@@ -160,14 +162,33 @@ class RNEmojiMainColorModule(
     }
 
     val sortedClusters = clusters.sortedByDescending { it.score() }
-    val mainColor = sortedClusters.first().hex()
+    val mainCluster = sortedClusters.first()
+    val mainColor = mainCluster.hex()
+    val mainDarkColor = selectDarkCluster(sortedClusters, mainCluster).hex()
+    val mainLightColor = selectLightCluster(sortedClusters, mainCluster).hex()
     val palette = if (paletteSize > 0) {
       sortedClusters.take(paletteSize).map { it.hex() }
     } else {
       null
     }
 
-    return AnalysisResult(mainColor, palette)
+    return AnalysisResult(mainColor, mainDarkColor, mainLightColor, palette)
+  }
+
+  private fun selectDarkCluster(clusters: List<Cluster>, mainCluster: Cluster): Cluster {
+    val mainBrightness = mainCluster.brightness()
+    return clusters
+      .filter { it.brightness() < mainBrightness }
+      .maxByOrNull { it.score() }
+      ?: mainCluster
+  }
+
+  private fun selectLightCluster(clusters: List<Cluster>, mainCluster: Cluster): Cluster {
+    val mainBrightness = mainCluster.brightness()
+    return clusters
+      .filter { it.brightness() > mainBrightness }
+      .maxByOrNull { it.score() }
+      ?: mainCluster
   }
 
   private fun pixelWeight(red: Int, green: Int, blue: Int, alpha: Int): Double {
@@ -201,6 +222,8 @@ class RNEmojiMainColorModule(
     val map = Arguments.createMap()
     map.putString("emoji", value.optString("emoji"))
     map.putString("mainColor", value.optString("mainColor"))
+    map.putString("mainDarkColor", value.optString("mainDarkColor"))
+    map.putString("mainLightColor", value.optString("mainLightColor"))
 
     if (value.has("palette")) {
       val jsonArray = value.optJSONArray("palette")
@@ -240,12 +263,16 @@ class RNEmojiMainColorModule(
 
   private data class AnalysisResult(
     val mainColor: String,
+    val mainDarkColor: String,
+    val mainLightColor: String,
     val palette: List<String>?,
   ) {
     fun toWritableMap(emoji: String): WritableMap {
       val map = Arguments.createMap()
       map.putString("emoji", emoji)
       map.putString("mainColor", mainColor)
+      map.putString("mainDarkColor", mainDarkColor)
+      map.putString("mainLightColor", mainLightColor)
 
       if (!palette.isNullOrEmpty()) {
         val array: WritableArray = Arguments.createArray()
@@ -325,6 +352,10 @@ class RNEmojiMainColorModule(
       val green = averageGreen().roundToInt().coerceIn(0, 255)
       val blue = averageBlue().roundToInt().coerceIn(0, 255)
       return String.format("#%02X%02X%02X", red, green, blue)
+    }
+
+    fun brightness(): Double {
+      return (averageRed() * 299.0 + averageGreen() * 587.0 + averageBlue() * 114.0) / 1000.0
     }
 
     private fun averageRed(): Double = redTotal / weightTotal
