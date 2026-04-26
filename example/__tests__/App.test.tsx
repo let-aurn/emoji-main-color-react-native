@@ -5,7 +5,7 @@
 import 'react-native';
 import React from 'react';
 import App from '../App';
-import {getEmojiColors, useEmojiColor} from 'emoji-main-color-react-native';
+import {useEmojiColor} from 'emoji-main-color-react-native';
 import {useEmojiKeyboard} from 'react-native-system-emoji-picker';
 
 // Note: import explicitly to use the types shipped with jest.
@@ -14,7 +14,6 @@ import {describe, it, expect, beforeEach} from '@jest/globals';
 import {fireEvent, render} from '@testing-library/react-native';
 
 jest.mock('emoji-main-color-react-native', () => ({
-  getEmojiColors: jest.fn(),
   useEmojiColor: jest.fn(),
 }));
 
@@ -24,10 +23,14 @@ jest.mock('react-native-system-emoji-picker', () => ({
 }));
 
 describe('App', () => {
+  let openEmojiPicker: jest.Mock;
+
   beforeEach(() => {
+    openEmojiPicker = jest.fn();
+
     (useEmojiKeyboard as jest.Mock).mockReturnValue({
       ref: {current: null},
-      open: jest.fn(),
+      open: openEmojiPicker,
       dismiss: jest.fn(),
     });
 
@@ -44,55 +47,35 @@ describe('App', () => {
       error: null,
       reload: jest.fn(),
     });
-
-    (getEmojiColors as jest.Mock).mockResolvedValue([
-      {
-        emoji: '🍋',
-        mainColor: '#F4D83D',
-        mainDarkColor: '#6D8D3F',
-        mainLightColor: '#F8E789',
-        source: 'computed',
-      },
-      {
-        emoji: '🦊',
-        mainColor: '#D97729',
-        mainDarkColor: '#8F3F1E',
-        mainLightColor: '#F3A552',
-        source: 'computed',
-      },
-    ] as Array<{
-      emoji: string;
-      mainColor: string;
-      mainDarkColor: string;
-      mainLightColor: string;
-      source: string;
-    }>);
   });
 
   it('renders correctly', () => {
     render(<App />);
   });
 
-  it('toggles cache text between memory and disk', () => {
+  it('selects a sample emoji', () => {
     const screen = render(<App />);
 
-    expect(screen.getByText('Cache: memory')).toBeTruthy();
-
-    fireEvent.press(screen.getByText('Use disk cache'));
-    expect(screen.getByText('Cache: disk')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('emoji-option-🦊'));
+    expect(screen.getByTestId('selected-emoji').props.children).toBe('🦊');
   });
 
-  it('runs the batch demo', async () => {
+  it('opens the picker from the dashed emoji box', () => {
     const screen = render(<App />);
 
-    fireEvent.press(screen.getByText('Run batch demo'));
-
-    expect(await screen.findByText('🍋 #F4D83D • 🦊 #D97729')).toBeTruthy();
+    fireEvent.press(screen.getByTestId('emoji-picker-option'));
+    expect(openEmojiPicker).toHaveBeenCalledTimes(1);
   });
 
-  it('shows the picker status', () => {
+  it('displays the picked emoji in the preview and picker box', () => {
     const screen = render(<App />);
+    const picker = screen.UNSAFE_getByType(
+      'RNSystemEmojiPickerView' as unknown as React.ComponentType<unknown>,
+    );
 
-    expect(screen.getByText('Picker: closed')).toBeTruthy();
+    fireEvent(picker, 'onEmojiSelected', '💶');
+
+    expect(screen.getByTestId('selected-emoji').props.children).toBe('💶');
+    expect(screen.getAllByText('💶')).toHaveLength(2);
   });
 });
